@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Weather</title>
+    </head>
+    <body>
+            <input type="text" id="inputZipCode" name="inputZipCode" placeholder="Type in zipcode...">
+            <div id="status">...</div>
+            <div id="weatherDisplay"></div>
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script>
+            $("#inputZipCode").on("keyup", function(event){
+                event.preventDefault();  // test what happens without it
+                var inputZipCode = parseInt($("#inputZipCode").val());
+                
+                if (event.which === 13  && inputZipCode.toString(10).length === 5) {
+                    var url = 'https://api.openweathermap.org/data/2.5/weather';
+                    $.ajax(url, {
+                        timeout: 3000,
+                        type:'GET',
+                        beforeSend: function() {$("#status").html("Starting...")},
+                        complete: function() {$("#status").html("Complete!!!")},
+                        error: function(request, errorType, errorMessage){ console.log(`ERROR - ${errorType} - ${errorMessage}`)},
+                        data: {
+                          APPID:'',
+                          zip:`${inputZipCode},us`,
+                          units:'imperial',
+                        },
+                        success: function (response) {
+                            var paragraph = $("<p></p>");
+                            var temp = response.main.temp;
+                            var location = response.name;
+                            var weather_discription = response.weather[0].description;
+                            var coordinates = response.coord.lon + response.coord.lat + '';
+                            var htmloutput = paragraph.text(`The temperature is ${temp} F, at ${location} [${coordinates}], with ${weather_discription}`);
+                            $("#weatherDisplay").html(htmloutput);
+                            console.log(response);
+                            $(document).prop('title', `Weather - ${inputZipCode}`);
+                        },
+                    });
+                }
+            });
+
+        </script>
+    </body>
+</html>
